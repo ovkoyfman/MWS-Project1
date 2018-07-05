@@ -79,7 +79,8 @@ initMap = () => {
         scrollWheelZoom: false
       });
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
-    mapboxToken: '{mapboxToken}',
+    mapboxToken: 'pk.eyJ1Ijoib2tveWZtYW4iLCJhIjoiY2ppc3Z0NDY4MGs2OTN3bG9wNXBpYXlwNSJ9.MpI8pnoEx-gQVFY5HTy7iQ',
+    //mapboxToken: '<your MAPBOX API KEY HERE>',
     maxZoom: 18,
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
       '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -162,6 +163,9 @@ createRestaurantHTML = (restaurant) => {
   const image = document.createElement('img');
   image.className = 'restaurant-img';
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.srcset = DBHelper.imageUrlForRestaurantx1(restaurant) + ' 400w, ' + DBHelper.imageUrlForRestaurant(restaurant) + ' 800w';
+  image.sizes = "(max-width: 575px) 85vw, (max-width: 991px) 43vw, (min-width: 992px) 30vw";
+  image.alt = restaurant.name;
   li.append(image);
 
   const name = document.createElement('h2');
@@ -169,6 +173,7 @@ createRestaurantHTML = (restaurant) => {
   li.append(name);
 
   const neighborhood = document.createElement('p');
+
   neighborhood.innerHTML = restaurant.neighborhood;
   li.append(neighborhood);
 
@@ -176,9 +181,9 @@ createRestaurantHTML = (restaurant) => {
   address.innerHTML = restaurant.address;
   li.append(address);
 
-  const more = document.createElement('a');
+  const more = document.createElement('button');
   more.innerHTML = 'View Details';
-  more.href = DBHelper.urlForRestaurant(restaurant);
+  more.onclick = function(){window.open(DBHelper.urlForRestaurant(restaurant), "_self")};
   li.append(more)
 
   return li
@@ -197,7 +202,7 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     self.markers.push(marker);
   });
 } 
-makeAllListingSameHeight = () => {
+/*makeAllListingSameHeight = () => {
   let max = 0;
   console.log(document.querySelectorAll('li'));
   document.querySelectorAll('#restaurants-list li').forEach(function(value, key){
@@ -207,7 +212,7 @@ makeAllListingSameHeight = () => {
   document.querySelectorAll('#restaurants-list li').forEach(function(value, key){
     value.offsetHeight = max;
   });
-}
+}*/
 
 /* addMarkersToMap = (restaurants = self.restaurants) => {
   restaurants.forEach(restaurant => {
