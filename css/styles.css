@@ -326,6 +326,7 @@ nav h1 a {
 @media screen and (min-width: 992px){
   #restaurants-list li {
     width: calc((100% - 282px)/3);
+  }
 }
 @media screen and (min-width:1200px){
   #maincontent {
