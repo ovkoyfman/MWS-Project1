@@ -9,13 +9,13 @@ var markers = []
  */
 document.addEventListener('DOMContentLoaded', (event) => {
   initMap(); // added 
-  fetchNeighborhoods();
-  fetchCuisines();
+ // fetchNeighborhoods();
+  //fetchCuisines();
   
   //setTimeout(function(){ makeAllListingSameHeight(); }, 3000);
 });
 if(navigator.serviceWorker){
-  navigator.serviceWorker.register('/js/sw.js');
+  navigator.serviceWorker.register('/sw.js');
 }
 /**
  * Fetch all neighborhoods and set their HTML.
@@ -149,6 +149,7 @@ resetRestaurants = (restaurants) => {
 /**
  * Create all restaurants HTML and add them to the webpage.
  */
+console.log(self.restaurants);
 fillRestaurantsHTML = (restaurants = self.restaurants) => {
   const ul = document.getElementById('restaurants-list');
   restaurants.forEach(restaurant => {

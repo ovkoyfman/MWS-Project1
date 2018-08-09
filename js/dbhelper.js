@@ -8,20 +8,22 @@ class DBHelper {
    * Change this to restaurants.json file location on your server.
    */
   static get DATABASE_URL() {
-    const port = 8000 // Change this to your server port
-    return `http://localhost:${port}/data/restaurants.json`;
+    const port = 1337 // Change this to your server port
+    return `http://localhost:${port}/restaurants`;
   }
 
   /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
+    console.log('1');
     let xhr = new XMLHttpRequest();
     xhr.open('GET', DBHelper.DATABASE_URL);
     xhr.onload = () => {
       if (xhr.status === 200) { // Got a success response from server!
         const json = JSON.parse(xhr.responseText);
-        const restaurants = json.restaurants;
+        const restaurants = json;
+        console.log(restaurants);
         callback(null, restaurants);
       } else { // Oops!. Got an error from server.
         const error = (`Request failed. Returned status of ${xhr.status}`);
@@ -37,6 +39,7 @@ class DBHelper {
   static fetchRestaurantById(id, callback) {
     // fetch all restaurants with proper error handling.
     DBHelper.fetchRestaurants((error, restaurants) => {
+      console.log('2');
       if (error) {
         callback(error, null);
       } else {
@@ -56,6 +59,7 @@ class DBHelper {
   static fetchRestaurantByCuisine(cuisine, callback) {
     // Fetch all restaurants  with proper error handling
     DBHelper.fetchRestaurants((error, restaurants) => {
+      console.log('3');
       if (error) {
         callback(error, null);
       } else {
@@ -72,6 +76,7 @@ class DBHelper {
   static fetchRestaurantByNeighborhood(neighborhood, callback) {
     // Fetch all restaurants
     DBHelper.fetchRestaurants((error, restaurants) => {
+      console.log('4');
       if (error) {
         callback(error, null);
       } else {
@@ -88,6 +93,7 @@ class DBHelper {
   static fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, callback) {
     // Fetch all restaurants
     DBHelper.fetchRestaurants((error, restaurants) => {
+      console.log('5');
       if (error) {
         callback(error, null);
       } else {
@@ -109,6 +115,7 @@ class DBHelper {
   static fetchNeighborhoods(callback) {
     // Fetch all restaurants
     DBHelper.fetchRestaurants((error, restaurants) => {
+      console.log('6');
       if (error) {
         callback(error, null);
       } else {
@@ -127,6 +134,7 @@ class DBHelper {
   static fetchCuisines(callback) {
     // Fetch all restaurants
     DBHelper.fetchRestaurants((error, restaurants) => {
+      console.log('7');
       if (error) {
         callback(error, null);
       } else {
@@ -151,14 +159,16 @@ class DBHelper {
    */
   static imageUrlForRestaurant(restaurant) {
     //console.log('img',`/img/${restaurant.photograph}`);
-    return (`/img/${restaurant.photograph}`);
+    if(!restaurant.photograph) restaurant.photograph = "1";
+    return (`/img/${restaurant.photograph}.jpg`);
   }
   /**
    * Restaurant x1 image URL.
    */
   static imageUrlForRestaurantx1(restaurant) {
     //console.log(`${restaurant.photographx1}`);
-    return (`/img/${restaurant.photographx1}`);
+    if(!restaurant.photograph) restaurant.photograph = "1";
+    return (`/img/${restaurant.photograph}x1.jpg`);
   }
   /**
    * Map marker for a restaurant.
