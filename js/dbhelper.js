@@ -15,30 +15,38 @@ class DBHelper {
   /**
    * Fetch all restaurants.
    */
+  // static fetchRestaurants(callback) {
+  //   console.log('1');
+  //   let xhr = new XMLHttpRequest();
+  //   xhr.open('GET', DBHelper.DATABASE_URL);
+  //   xhr.onload = () => {
+  //     if (xhr.status === 200) { // Got a success response from server!
+  //       const json = JSON.parse(xhr.responseText);
+  //       const restaurants = json;
+  //       console.log(restaurants);
+  //       callback(null, restaurants);
+  //     } else { // Oops!. Got an error from server.
+  //       const error = (`Request failed. Returned status of ${xhr.status}`);
+  //       callback(error, null);
+  //     }
+  //   };
+  //   xhr.send();
+  // }
   static fetchRestaurants(callback) {
-    console.log('1');
-    let xhr = new XMLHttpRequest();
-    xhr.open('GET', DBHelper.DATABASE_URL);
-    xhr.onload = () => {
-      if (xhr.status === 200) { // Got a success response from server!
-        const json = JSON.parse(xhr.responseText);
-        const restaurants = json;
-        console.log(restaurants);
-        callback(null, restaurants);
-      } else { // Oops!. Got an error from server.
-        const error = (`Request failed. Returned status of ${xhr.status}`);
-        callback(error, null);
-      }
-    };
-    xhr.send();
-  }
-
+    console.log(9);
+    fetch(DBHelper.DATABASE_URL).then(function(response) {
+        return response.json();
+      }).then(callback).catch(function(error){const errorToDisplay = (`Request failed. Returned status of ${error}`);
+        console.log(errorToDisplay);
+      //callback(errorToDisplay, null);
+      }) // Oops!. Got an error from server.
+    }
   /**
    * Fetch a restaurant by its ID.
    */
   static fetchRestaurantById(id, callback) {
     // fetch all restaurants with proper error handling.
-    DBHelper.fetchRestaurants((error, restaurants) => {
+    DBHelper.fetchRestaurants((restaurants) => {
       console.log('2');
       if (error) {
         callback(error, null);
@@ -58,7 +66,7 @@ class DBHelper {
    */
   static fetchRestaurantByCuisine(cuisine, callback) {
     // Fetch all restaurants  with proper error handling
-    DBHelper.fetchRestaurants((error, restaurants) => {
+    DBHelper.fetchRestaurants((restaurants) => {
       console.log('3');
       if (error) {
         callback(error, null);
@@ -75,7 +83,7 @@ class DBHelper {
    */
   static fetchRestaurantByNeighborhood(neighborhood, callback) {
     // Fetch all restaurants
-    DBHelper.fetchRestaurants((error, restaurants) => {
+    DBHelper.fetchRestaurants((restaurants) => {
       console.log('4');
       if (error) {
         callback(error, null);
@@ -92,11 +100,9 @@ class DBHelper {
    */
   static fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, callback) {
     // Fetch all restaurants
-    DBHelper.fetchRestaurants((error, restaurants) => {
-      console.log('5');
-      if (error) {
-        callback(error, null);
-      } else {
+    DBHelper.fetchRestaurants((restaurants) => {
+     // console.log('5',restaurants);
+    
         let results = restaurants
         if (cuisine != 'all') { // filter by cuisine
           results = results.filter(r => r.cuisine_type == cuisine);
@@ -105,7 +111,6 @@ class DBHelper {
           results = results.filter(r => r.neighborhood == neighborhood);
         }
         callback(null, results);
-      }
     });
   }
 
@@ -114,7 +119,7 @@ class DBHelper {
    */
   static fetchNeighborhoods(callback) {
     // Fetch all restaurants
-    DBHelper.fetchRestaurants((error, restaurants) => {
+    DBHelper.fetchRestaurants((restaurants) => {
       console.log('6');
       if (error) {
         callback(error, null);
@@ -133,7 +138,7 @@ class DBHelper {
    */
   static fetchCuisines(callback) {
     // Fetch all restaurants
-    DBHelper.fetchRestaurants((error, restaurants) => {
+    DBHelper.fetchRestaurants((restaurants) => {
       console.log('7');
       if (error) {
         callback(error, null);

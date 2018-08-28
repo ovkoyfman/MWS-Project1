@@ -35,6 +35,7 @@ fetchNeighborhoods = () => {
  * Set neighborhoods HTML.
  */
 fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
+  console.log(neighborhoods);
   const select = document.getElementById('neighborhoods-select');
   neighborhoods.forEach(neighborhood => {
     const option = document.createElement('option');
@@ -63,13 +64,13 @@ fetchCuisines = () => {
  */
 fillCuisinesHTML = (cuisines = self.cuisines) => {
   const select = document.getElementById('cuisines-select');
-
-  cuisines.forEach(cuisine => {
-    const option = document.createElement('option');
-    option.innerHTML = cuisine;
-    option.value = cuisine;
-    select.append(option);
-  });
+  console.log(cuisines);
+   cuisines.forEach(cuisine => {
+     const option = document.createElement('option');
+     option.innerHTML = cuisine;
+     option.value = cuisine;
+     select.append(option);
+   });
 }
 
 /**
@@ -121,7 +122,7 @@ updateRestaurants = () => {
 
   DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
     if (error) { // Got an error!
-      console.error(error);
+      console.log(error);
     } else {
       resetRestaurants(restaurants);
       fillRestaurantsHTML();
@@ -149,12 +150,12 @@ resetRestaurants = (restaurants) => {
 /**
  * Create all restaurants HTML and add them to the webpage.
  */
-console.log(self.restaurants);
 fillRestaurantsHTML = (restaurants = self.restaurants) => {
   const ul = document.getElementById('restaurants-list');
-  restaurants.forEach(restaurant => {
-    ul.append(createRestaurantHTML(restaurant));
-  });
+  //console.log(self.restaurants);
+   restaurants.forEach(restaurant => {
+     ul.append(createRestaurantHTML(restaurant));
+   });
   addMarkersToMap();
 }
 
@@ -196,6 +197,7 @@ createRestaurantHTML = (restaurant) => {
  * Add markers for current restaurants to the map.
  */
 addMarkersToMap = (restaurants = self.restaurants) => {
+  //console.log(restaurants)
   restaurants.forEach(restaurant => {
     // Add marker to the map
     const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.newMap);
