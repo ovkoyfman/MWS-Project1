@@ -9,8 +9,8 @@ var markers = []
  */
 document.addEventListener('DOMContentLoaded', (event) => {
   initMap(); // added 
- // fetchNeighborhoods();
-  //fetchCuisines();
+  fetchNeighborhoods();
+  fetchCuisines();
   
   //setTimeout(function(){ makeAllListingSameHeight(); }, 3000);
 });

@@ -190,6 +190,8 @@ nav h1 a {
   text-transform: uppercase;
   cursor: pointer;
   border: 2px solid #f18200;
+  position: absolute;
+  bottom: 20px;
 }
 #restaurants-list li button:hover{
   background-color: #fff;

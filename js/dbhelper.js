@@ -48,16 +48,12 @@ class DBHelper {
     // fetch all restaurants with proper error handling.
     DBHelper.fetchRestaurants((restaurants) => {
       console.log('2');
-      if (error) {
-        callback(error, null);
-      } else {
         const restaurant = restaurants.find(r => r.id == id);
         if (restaurant) { // Got the restaurant
           callback(null, restaurant);
         } else { // Restaurant does not exist in the database
           callback('Restaurant does not exist', null);
         }
-      }
     });
   }
 
@@ -68,13 +64,9 @@ class DBHelper {
     // Fetch all restaurants  with proper error handling
     DBHelper.fetchRestaurants((restaurants) => {
       console.log('3');
-      if (error) {
-        callback(error, null);
-      } else {
-        // Filter restaurants to have only given cuisine type
-        const results = restaurants.filter(r => r.cuisine_type == cuisine);
-        callback(null, results);
-      }
+      // Filter restaurants to have only given cuisine type
+      const results = restaurants.filter(r => r.cuisine_type == cuisine);
+      callback(results);
     });
   }
 
@@ -140,15 +132,11 @@ class DBHelper {
     // Fetch all restaurants
     DBHelper.fetchRestaurants((restaurants) => {
       console.log('7');
-      if (error) {
-        callback(error, null);
-      } else {
         // Get all cuisines from all restaurants
         const cuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
         // Remove duplicates from cuisines
         const uniqueCuisines = cuisines.filter((v, i) => cuisines.indexOf(v) == i)
         callback(null, uniqueCuisines);
-      }
     });
   }
 
