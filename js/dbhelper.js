@@ -38,6 +38,20 @@ class DBHelper {
     else url = DBHelper.DATABASE_URL;
     console.log(url);
     fetch(url).then(function(response) {
+        var responseForDatabase = response.clone();
+        var restaurants = responseForDatabase.json();
+        
+        dbPromise.then(function(db){
+          if(!db) return;
+          var tx = db.transaction('restaurants','readwrite');
+          var store = tx.objectStore('restaurants');
+          restaurants.then(function(data){
+            data.forEach(function(restaurant){
+              store.put(restaurant);
+            })
+          })
+          
+        })
         return response.json();
       }).then(callback).catch(callbackError);
     }
@@ -107,7 +121,8 @@ class DBHelper {
    */
   static fetchNeighborhoods(callback) {
     // Fetch all restaurants
-    DBHelper.fetchRestaurants((restaurants) => {
+    DBHelper.fetchRestaurants(null,(restaurants) => {
+        
         // Get all neighborhoods from all restaurants
         const neighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood)
         // Remove duplicates from neighborhoods

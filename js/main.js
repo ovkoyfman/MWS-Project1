@@ -8,20 +8,6 @@ var markers = []
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
-  DBHelper.fetchRestaurants((restaurants) => {
-    self.restaurants = restaurants;
-    console.log("1",restaurants);
-    const allCuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
-    // Remove duplicates from cuisines
-    const cuisines = allCuisines.filter((v, i) => allCuisines.indexOf(v) == i)
-    const allNeighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood)
-    // Remove duplicates from neighborhoods
-    const neighborhoods = allNeighborhoods.filter((v, i) => allNeighborhoods.indexOf(v) == i)
-    //self.neighborhoods = neighborhoods;
-    //self.cuisines = cuisines;
-    fillNeighborhoodsHTML(neighborhoods);
-    fillCuisinesHTML(cuisines);
-  },displayError);
   console.log(self.restaurants)
   initMap(); // added 
   //fetchNeighborhoods();
@@ -40,7 +26,20 @@ document.addEventListener('DOMContentLoaded', (event) => {
 //       fillNeighborhoodsHTML();
 //   });
 // }
-
+var fillData = (restaurants) => {
+  self.restaurants = restaurants;
+  console.log("1",restaurants);
+  const allCuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
+  // Remove duplicates from cuisines
+  const cuisines = allCuisines.filter((v, i) => allCuisines.indexOf(v) == i)
+  const allNeighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood)
+  // Remove duplicates from neighborhoods
+  const neighborhoods = allNeighborhoods.filter((v, i) => allNeighborhoods.indexOf(v) == i)
+  //self.neighborhoods = neighborhoods;
+  //self.cuisines = cuisines;
+  fillNeighborhoodsHTML(neighborhoods);
+  fillCuisinesHTML(cuisines);
+}
 /**
  * Set neighborhoods HTML.
  */
@@ -128,6 +127,7 @@ updateRestaurants = () => {
   DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (response) => {
     resetRestaurants(response);
     fillRestaurantsHTML();
+    fillData(response)
   })
 }
 
@@ -135,6 +135,7 @@ updateRestaurants = () => {
  * Clear current restaurants, their HTML and remove their map markers.
  */
 resetRestaurants = (restaurants) => {
+  console.log(restaurants);
   // Remove all restaurants
   self.restaurants = [];
   const ul = document.getElementById('restaurants-list');
