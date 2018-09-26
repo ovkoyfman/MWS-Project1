@@ -56,13 +56,12 @@ fetchRestaurantFromURL = (callback) => {
     return;
   }
   const id = getParameterByName('id');
-    DBHelper.fetchRestaurants(id, (restaurant) => {
-      console.log(restaurant);
+  restaurant = self.restaurants[id-1];
+  console.log(restaurant);
       self.restaurant = restaurant;
       fillRestaurantHTML();
       callback(restaurant)
-    });
-}
+  }
 
 /**
  * Create restaurant HTML and add it to the webpage

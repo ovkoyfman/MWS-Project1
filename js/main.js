@@ -8,6 +8,9 @@ var markers = []
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
+  dbPromise = idb.open('restaurantsDatabase', 1, function(upgradeDb) {
+    var keyValStore =  upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
+  });
   console.log(self.restaurants)
   initMap(); // added 
   //fetchNeighborhoods();
@@ -28,7 +31,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
 // }
 var fillData = (restaurants) => {
   self.restaurants = restaurants;
-  console.log("1",restaurants);
+  console.log("1");
+  console.log(restaurants);
+
   const allCuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
   // Remove duplicates from cuisines
   const cuisines = allCuisines.filter((v, i) => allCuisines.indexOf(v) == i)
@@ -44,6 +49,9 @@ var fillData = (restaurants) => {
  * Set neighborhoods HTML.
  */
 var fillNeighborhoodsHTML = (neighborhoods) => {
+  console.log("2");
+  console.log(restaurants);
+
   const select = document.getElementById('neighborhoods-select');
   neighborhoods.forEach(neighborhood => {
     const option = document.createElement('option');
@@ -115,6 +123,8 @@ initMap = () => {
  */
 updateRestaurants = () => {
   console.log(1);
+  console.log(restaurants);
+
   const cSelect = document.getElementById('cuisines-select');
   const nSelect = document.getElementById('neighborhoods-select');
 
@@ -127,7 +137,10 @@ updateRestaurants = () => {
   DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (response) => {
     resetRestaurants(response);
     fillRestaurantsHTML();
-    fillData(response)
+    fillData(response);
+    console.log(restaurants);
+    console.log(self.restaurants);
+    console.log("After");
   })
 }
 
@@ -135,7 +148,9 @@ updateRestaurants = () => {
  * Clear current restaurants, their HTML and remove their map markers.
  */
 resetRestaurants = (restaurants) => {
+  console.log("3");
   console.log(restaurants);
+
   // Remove all restaurants
   self.restaurants = [];
   const ul = document.getElementById('restaurants-list');
@@ -153,6 +168,9 @@ resetRestaurants = (restaurants) => {
  * Create all restaurants HTML and add them to the webpage.
  */
 fillRestaurantsHTML = (restaurants = self.restaurants) => {
+  console.log("4");
+  console.log(restaurants);
+
   const ul = document.getElementById('restaurants-list');
   restaurants.forEach(restaurant => {
     ul.append(createRestaurantHTML(restaurant));
@@ -164,6 +182,9 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
  * Create restaurant HTML.
  */
 createRestaurantHTML = (restaurant) => {
+  console.log("5");
+  console.log(restaurant);
+
   const li = document.createElement('li');
 
   const image = document.createElement('img');
@@ -198,6 +219,9 @@ createRestaurantHTML = (restaurant) => {
  * Add markers for current restaurants to the map.
  */
 addMarkersToMap = (restaurants = self.restaurants) => {
+  console.log("6");
+  console.log(restaurants);
+
   restaurants.forEach(restaurant => {
     // Add marker to the map
     const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.newMap);

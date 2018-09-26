@@ -11,7 +11,6 @@ class DBHelper {
     const port = 1337 // Change this to your server port
     return `http://localhost:${port}/restaurants`;
   }
- 
   /**
    * Fetch all restaurants.
    */
@@ -32,33 +31,49 @@ class DBHelper {
   //   };
   //   xhr.send();
   // }
-  static fetchRestaurants(id,callback,callbackError){
+  static fetchRestaurants(id,callback){
     var url;
-    if(id) url = DBHelper.DATABASE_URL + '/?id=' + id;
-    else url = DBHelper.DATABASE_URL;
-    console.log(url);
+    url = DBHelper.DATABASE_URL;
+    var dbPromise = idb.open('restaurantsDatabase');
+    
+    dbPromise.then(function(db){
+      var dbTransection = db.transaction('restaurants','readonly').objectStore('restaurants').getAll();
+      if(id) dbTransection.then(function(data){callback(data[id-1])});
+      else  dbTransection.then(function(data){callback(data)});
+    })
     fetch(url).then(function(response) {
-        var responseForDatabase = response.clone();
-        var restaurants = responseForDatabase.json();
-        
-        dbPromise.then(function(db){
-          if(!db) return;
-          var tx = db.transaction('restaurants','readwrite');
-          var store = tx.objectStore('restaurants');
-          restaurants.then(function(data){
-            data.forEach(function(restaurant){
-              store.put(restaurant);
-            })
+      console.log(response);
+      var responseForDatabase = response.clone();
+      var responseForPopulating = response.json();
+      //console.log(responseForDatabase);
+      var restaurants = responseForDatabase.json();
+      dbPromise.then(function(db){
+        if(!db) return;
+        var store = db.transaction('restaurants','readwrite').objectStore('restaurants');
+        restaurants.then(function(data){
+          data.forEach(function(restaurant){
+            store.put(restaurant);
           })
-          
-        })
-        return response.json();
-      }).then(callback).catch(callbackError);
-    }
+        }) 
+      })
+      if(id) responseForPopulating.then(function(data){callback(data[id-1])})
+      else  responseForPopulating.then(function(data){callback(data)})
+      
+    })
+    //if(id) url = DBHelper.DATABASE_URL + '/?id=' + id;
+    //else 
+    url = DBHelper.DATABASE_URL;
+    console.log(dbPromise);
+    
+    // fetch(url).then(function(response) {
+    //     return tempResponse;
+    //   }).then(callback).catch(callbackError);
+   }
   /**
    * Fetch a restaurant by its ID.
    */
   static fetchRestaurantById(id, callback) {
+    console.log("7");
     // fetch all restaurants with proper error handling.
     DBHelper.fetchRestaurants(id,(restaurants) => {
         const restaurant = restaurants;
@@ -74,9 +89,12 @@ class DBHelper {
    * Fetch restaurants by a cuisine type with proper error handling.
    */
   static fetchRestaurantByCuisine(cuisine, callback) {
+    restaurants = self.restaurants;
+    console.log(restaurants);
+
     // Fetch all restaurants  with proper error handling
-    DBHelper.fetchRestaurants(null,(restaurants) => {
-      console.log('3');
+      console.log('8');
+      
       if (error) {
         callback(error, null);
       } else {
@@ -84,7 +102,6 @@ class DBHelper {
         const results = restaurants.filter(r => r.cuisine_type == cuisine);
         callback(null, results);
       }
-    });
   }
 
   /**
@@ -104,9 +121,10 @@ class DBHelper {
    */
   static fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, callback) {
     // Fetch all restaurants
+    console.log("9");
     DBHelper.fetchRestaurants(null,(restaurants) => {
-      let results = restaurants
-      console.log("fetchRestaurants inside fetchRestaurantByCuisineAndNeighborhood",restaurants);
+      console.log(restaurants);
+      let results = restaurants;
       if (cuisine != 'all') { // filter by cuisine
         results = results.filter(r => r.cuisine_type == cuisine);
       }
@@ -120,15 +138,17 @@ class DBHelper {
    * Fetch all neighborhoods with proper error handling.
    */
   static fetchNeighborhoods(callback) {
+    console.log("10");
+
     // Fetch all restaurants
-    DBHelper.fetchRestaurants(null,(restaurants) => {
-        
+    restaurants = self.restaurants;
+    console.log(restaurants);
+
         // Get all neighborhoods from all restaurants
         const neighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood)
         // Remove duplicates from neighborhoods
         const uniqueNeighborhoods = neighborhoods.filter((v, i) => neighborhoods.indexOf(v) == i)
         callback(uniqueNeighborhoods);
-    });
   }
 
   /**
@@ -136,14 +156,16 @@ class DBHelper {
    */
   static fetchCuisines(callback) {
     // Fetch all restaurants
-      DBHelper.fetchRestaurants(null,(restaurants) => {
-        // Get all cuisines from all restaurants
+    console.log("11");
+    restaurants = self.restaurants;
+    console.log(restaurants);
+
+    // Get all cuisines from all restaurants
         const cuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
         // Remove duplicates from cuisines
         const uniqueCuisines = cuisines.filter((v, i) => cuisines.indexOf(v) == i)
         callback(uniqueCuisines);
-      });
-  }
+    }
 
   /**
    * Restaurant page URL.

@@ -4,10 +4,18 @@ var cacheFiles = [
     '/index.html',
     '/restaurant.html',
     '/css/styles.css',
+    '/idb.js',
+    'js/offlinedb.js',
     '/js/main.js',
     '/js/dbhelper.js',
     '/js/restaurant_info.js'
 ];
+if (typeof idb === "undefined") {
+  self.importScripts('/idb.js');
+}
+var dbPromise = idb.open('restaurantsDatabase', 1, function(upgradeDb) {
+var keyValStore =  upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
+});
 self.addEventListener('install', function(event){
     event.waitUntil(
         caches.open(cacheName).then(
@@ -23,13 +31,17 @@ self.addEventListener('install', function(event){
 });
 
 self.addEventListener('fetch', function(event) {
-    event.respondWith(
-      caches.match(event.request)
+    var requestUrl = new URL(event.request.url);
+    if (requestUrl.pathname === '/restaurants'){
+        }
+    else{
+      event.respondWith(
+        caches.match(event.request)
         .then(function(response) {
           if (response) {
             return response;
           }
-          var fetchRequest = event.request.clone(); 
+          var fetchRequest = event.request.clone();
           return fetch(fetchRequest).then(
             function(response) {
               if(!response) {
@@ -45,4 +57,5 @@ self.addEventListener('fetch', function(event) {
           );
         })
       );
+    }
   });
