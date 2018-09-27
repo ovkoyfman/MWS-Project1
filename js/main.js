@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   dbPromise = idb.open('restaurantsDatabase', 1, function(upgradeDb) {
     var keyValStore =  upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
   });
+  console.log("DOM Loaded")
   console.log(self.restaurants)
   initMap(); // added 
   //fetchNeighborhoods();
@@ -31,7 +32,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 // }
 var fillData = (restaurants) => {
   self.restaurants = restaurants;
-  console.log("1");
+  console.log("fillData");
   console.log(restaurants);
 
   const allCuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
@@ -49,7 +50,7 @@ var fillData = (restaurants) => {
  * Set neighborhoods HTML.
  */
 var fillNeighborhoodsHTML = (neighborhoods) => {
-  console.log("2");
+  console.log("fillNeighborhoodsHTML");
   console.log(restaurants);
 
   const select = document.getElementById('neighborhoods-select');
@@ -75,6 +76,7 @@ var fillNeighborhoodsHTML = (neighborhoods) => {
  * Set cuisines HTML.
  */
 fillCuisinesHTML = (cuisines = self.cuisines) => {
+  console.log("fillCuisinesHTML");
   const select = document.getElementById('cuisines-select');
   cuisines.forEach(cuisine => {
     const option = document.createElement('option');
@@ -88,6 +90,7 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
  * Initialize leaflet map, called from HTML.
  */
 initMap = () => {
+  console.log("initMap");
   self.newMap = L.map('map', {
         center: [40.722216, -73.987501],
         zoom: 12,
@@ -122,7 +125,8 @@ initMap = () => {
  * Update page and map for current restaurants.
  */
 updateRestaurants = () => {
-  console.log(1);
+
+  console.log("updateRestaurants");
   console.log(restaurants);
 
   const cSelect = document.getElementById('cuisines-select');
@@ -148,7 +152,7 @@ updateRestaurants = () => {
  * Clear current restaurants, their HTML and remove their map markers.
  */
 resetRestaurants = (restaurants) => {
-  console.log("3");
+  console.log("resetRestaurants");
   console.log(restaurants);
 
   // Remove all restaurants
@@ -168,7 +172,7 @@ resetRestaurants = (restaurants) => {
  * Create all restaurants HTML and add them to the webpage.
  */
 fillRestaurantsHTML = (restaurants = self.restaurants) => {
-  console.log("4");
+  console.log("fillRestaurantsHTML");
   console.log(restaurants);
 
   const ul = document.getElementById('restaurants-list');
@@ -182,7 +186,7 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
  * Create restaurant HTML.
  */
 createRestaurantHTML = (restaurant) => {
-  console.log("5");
+  console.log("createRestaurantHTML");
   console.log(restaurant);
 
   const li = document.createElement('li');
@@ -219,7 +223,7 @@ createRestaurantHTML = (restaurant) => {
  * Add markers for current restaurants to the map.
  */
 addMarkersToMap = (restaurants = self.restaurants) => {
-  console.log("6");
+  console.log("addMarkersToMap");
   console.log(restaurants);
 
   restaurants.forEach(restaurant => {

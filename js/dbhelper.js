@@ -32,6 +32,7 @@ class DBHelper {
   //   xhr.send();
   // }
   static fetchRestaurants(id,callback){
+    console.log("fetchRestaurants");
     var url;
     url = DBHelper.DATABASE_URL;
     var dbPromise = idb.open('restaurantsDatabase');
@@ -73,7 +74,7 @@ class DBHelper {
    * Fetch a restaurant by its ID.
    */
   static fetchRestaurantById(id, callback) {
-    console.log("7");
+    console.log("fetchRestaurantById");
     // fetch all restaurants with proper error handling.
     DBHelper.fetchRestaurants(id,(restaurants) => {
         const restaurant = restaurants;
@@ -93,7 +94,7 @@ class DBHelper {
     console.log(restaurants);
 
     // Fetch all restaurants  with proper error handling
-      console.log('8');
+      console.log('fetchRestaurantByCuisine');
       
       if (error) {
         callback(error, null);
@@ -121,7 +122,7 @@ class DBHelper {
    */
   static fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, callback) {
     // Fetch all restaurants
-    console.log("9");
+    console.log("fetchRestaurantByCuisineAndNeighborhood");
     DBHelper.fetchRestaurants(null,(restaurants) => {
       console.log(restaurants);
       let results = restaurants;
@@ -138,7 +139,7 @@ class DBHelper {
    * Fetch all neighborhoods with proper error handling.
    */
   static fetchNeighborhoods(callback) {
-    console.log("10");
+    console.log("fetchNeighborhoods");
 
     // Fetch all restaurants
     restaurants = self.restaurants;
@@ -156,7 +157,7 @@ class DBHelper {
    */
   static fetchCuisines(callback) {
     // Fetch all restaurants
-    console.log("11");
+    console.log("fetchCuisines");
     restaurants = self.restaurants;
     console.log(restaurants);
 
@@ -171,6 +172,7 @@ class DBHelper {
    * Restaurant page URL.
    */
   static urlForRestaurant(restaurant) {
+    console.log("urlForRestaurant");
     return (`./restaurant.html?id=${restaurant.id}`);
   }
 
@@ -178,6 +180,7 @@ class DBHelper {
    * Restaurant image and x2 URL.
    */
   static imageUrlForRestaurant(restaurant) {
+    console.log("imageUrlForRestaurant");
     //console.log('img',`/img/${restaurant.photograph}`);
     if(!restaurant.photograph) restaurant.photograph = "10";
     return (`/img/${restaurant.photograph}.jpg`);
@@ -186,6 +189,7 @@ class DBHelper {
    * Restaurant x1 image URL.
    */
   static imageUrlForRestaurantx1(restaurant) {
+    console.log("imageUrlForRestaurantx1");
     //console.log(`${restaurant.photographx1}`);
     if(!restaurant.photograph) restaurant.photograph = "10";
     return (`/img/${restaurant.photograph}x1.jpg`);
@@ -194,6 +198,8 @@ class DBHelper {
    * Map marker for a restaurant.
    */
    static mapMarkerForRestaurant(restaurant, map) {
+    console.log("mapMarkerForRestaurant");
+
     // https://leafletjs.com/reference-1.3.0.html#marker  
     const marker = new L.marker([restaurant.latlng.lat, restaurant.latlng.lng],
       {title: restaurant.name,

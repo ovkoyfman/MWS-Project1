@@ -32,6 +32,8 @@ self.addEventListener('install', function(event){
 
 self.addEventListener('fetch', function(event) {
     var requestUrl = new URL(event.request.url);
+    console.log('sw',requestUrl);
+    console.log(event)
     if (requestUrl.pathname === '/restaurants'){
         }
     else{
