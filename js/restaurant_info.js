@@ -51,18 +51,20 @@ initMap = () => {
  * Get current restaurant from page URL.
  */
 fetchRestaurantFromURL = (callback) => {
-  if (self.restaurant) { // restaurant already fetched!
-    callback(self.restaurant)
-    return;
-  }
-  const id = getParameterByName('id');
-  restaurant = self.restaurants[id-1];
-  console.log(restaurant);
-      self.restaurant = restaurant;
-      fillRestaurantHTML();
-      callback(restaurant)
-  }
-
+  DBHelper.fetchRestaurants(null, function(data){
+    self.restaurantsFetchedData = data;
+    if (self.restaurant) { // restaurant already fetched!
+      callback(self.restaurant)
+      return;
+    }
+    const id = getParameterByName('id');
+    restaurant = restaurantsFetchedData[id-1];
+    console.log(restaurant);
+        self.restaurant = restaurant;
+        fillRestaurantHTML();
+        callback(restaurant)
+    });
+}
 /**
  * Create restaurant HTML and add it to the webpage
  */

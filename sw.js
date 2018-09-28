@@ -13,9 +13,6 @@ var cacheFiles = [
 if (typeof idb === "undefined") {
   self.importScripts('/idb.js');
 }
-var dbPromise = idb.open('restaurantsDatabase', 1, function(upgradeDb) {
-var keyValStore =  upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
-});
 self.addEventListener('install', function(event){
     event.waitUntil(
         caches.open(cacheName).then(
@@ -34,9 +31,6 @@ self.addEventListener('fetch', function(event) {
     var requestUrl = new URL(event.request.url);
     console.log('sw',requestUrl);
     console.log(event)
-    if (requestUrl.pathname === '/restaurants'){
-        }
-    else{
       event.respondWith(
         caches.match(event.request)
         .then(function(response) {
@@ -59,5 +53,4 @@ self.addEventListener('fetch', function(event) {
           );
         })
       );
-    }
   });

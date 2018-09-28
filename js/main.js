@@ -1,19 +1,29 @@
 let restaurants,
   neighborhoods,
-  cuisines
+  cuisines,
+  restaurantsFetchedData;
 var newMap
-var markers = []
+var markers = [];
+var neighborhoodDataFilled = false;
+
 
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
   dbPromise = idb.open('restaurantsDatabase', 1, function(upgradeDb) {
-    var keyValStore =  upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
+    upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
   });
   console.log("DOM Loaded")
-  console.log(self.restaurants)
+  
+  DBHelper.fetchRestaurants(null, function(data){
+    self.restaurantsFetchedData = data;
+    console.log(self.restaurantsFetchedData)
+    updateRestaurants();
+  })
   initMap(); // added 
+  console.log(self.restaurantsFetchedData)
+  
   //fetchNeighborhoods();
   //fetchCuisines();
   //setTimeout(function(){ makeAllListingSameHeight(); }, 3000);
@@ -43,16 +53,16 @@ var fillData = (restaurants) => {
   const neighborhoods = allNeighborhoods.filter((v, i) => allNeighborhoods.indexOf(v) == i)
   //self.neighborhoods = neighborhoods;
   //self.cuisines = cuisines;
-  fillNeighborhoodsHTML(neighborhoods);
-  fillCuisinesHTML(cuisines);
+  if(!neighborhoodDataFilled){
+    fillNeighborhoodsHTML(neighborhoods);
+    fillCuisinesHTML(cuisines);
+    neighborhoodDataFilled = true;
+  }
 }
 /**
  * Set neighborhoods HTML.
  */
 var fillNeighborhoodsHTML = (neighborhoods) => {
-  console.log("fillNeighborhoodsHTML");
-  console.log(restaurants);
-
   const select = document.getElementById('neighborhoods-select');
   neighborhoods.forEach(neighborhood => {
     const option = document.createElement('option');
@@ -76,7 +86,6 @@ var fillNeighborhoodsHTML = (neighborhoods) => {
  * Set cuisines HTML.
  */
 fillCuisinesHTML = (cuisines = self.cuisines) => {
-  console.log("fillCuisinesHTML");
   const select = document.getElementById('cuisines-select');
   cuisines.forEach(cuisine => {
     const option = document.createElement('option');
@@ -105,8 +114,6 @@ initMap = () => {
       'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
     id: 'mapbox.streets'
   }).addTo(newMap);
-
-  updateRestaurants();
 }
 /* window.initMap = () => {
   let loc = {
@@ -127,7 +134,7 @@ initMap = () => {
 updateRestaurants = () => {
 
   console.log("updateRestaurants");
-  console.log(restaurants);
+  console.log(self.restaurantsFetchedData);
 
   const cSelect = document.getElementById('cuisines-select');
   const nSelect = document.getElementById('neighborhoods-select');
@@ -138,7 +145,7 @@ updateRestaurants = () => {
   const cuisine = cSelect[cIndex].value;
   const neighborhood = nSelect[nIndex].value;
 
-  DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (response) => {
+  DBHelper.getRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (response) => {
     resetRestaurants(response);
     fillRestaurantsHTML();
     fillData(response);
@@ -147,7 +154,6 @@ updateRestaurants = () => {
     console.log("After");
   })
 }
-
 /**
  * Clear current restaurants, their HTML and remove their map markers.
  */

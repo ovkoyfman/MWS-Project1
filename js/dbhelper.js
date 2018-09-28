@@ -39,8 +39,8 @@ class DBHelper {
     
     dbPromise.then(function(db){
       var dbTransection = db.transaction('restaurants','readonly').objectStore('restaurants').getAll();
-      if(id) dbTransection.then(function(data){callback(data[id-1])});
-      else  dbTransection.then(function(data){callback(data)});
+      if(id) return dbTransection.then(function(data){callback(data[id-1])});
+      else  return dbTransection.then(function(data){if(data.length){callback(data)}});
     })
     fetch(url).then(function(response) {
       console.log(response);
@@ -63,8 +63,6 @@ class DBHelper {
     })
     //if(id) url = DBHelper.DATABASE_URL + '/?id=' + id;
     //else 
-    url = DBHelper.DATABASE_URL;
-    console.log(dbPromise);
     
     // fetch(url).then(function(response) {
     //     return tempResponse;
@@ -90,7 +88,7 @@ class DBHelper {
    * Fetch restaurants by a cuisine type with proper error handling.
    */
   static fetchRestaurantByCuisine(cuisine, callback) {
-    restaurants = self.restaurants;
+    restaurants = self.restaurantsFetchedData;
     console.log(restaurants);
 
     // Fetch all restaurants  with proper error handling
@@ -120,10 +118,11 @@ class DBHelper {
   /**
    * Fetch restaurants by a cuisine and a neighborhood with proper error handling.
    */
-  static fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, callback) {
+  static getRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, callback) {
     // Fetch all restaurants
     console.log("fetchRestaurantByCuisineAndNeighborhood");
-    DBHelper.fetchRestaurants(null,(restaurants) => {
+      restaurants = self.restaurantsFetchedData;
+      console.log("Now I'm here");
       console.log(restaurants);
       let results = restaurants;
       if (cuisine != 'all') { // filter by cuisine
@@ -133,7 +132,6 @@ class DBHelper {
         results = results.filter(r => r.neighborhood == neighborhood);
       }
       callback(results);
-    });
   }
   /**
    * Fetch all neighborhoods with proper error handling.
