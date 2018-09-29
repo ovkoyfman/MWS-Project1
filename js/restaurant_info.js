@@ -59,17 +59,15 @@ fetchRestaurantFromURL = (callback) => {
     }
     const id = getParameterByName('id');
     restaurant = restaurantsFetchedData[id-1];
-    console.log(restaurant);
-        self.restaurant = restaurant;
-        fillRestaurantHTML();
-        callback(restaurant)
-    });
+    self.restaurant = restaurant;
+    fillRestaurantHTML();
+    callback(restaurant)
+  });
 }
 /**
  * Create restaurant HTML and add it to the webpage
  */
 fillRestaurantHTML = (restaurant = self.restaurant) => {
-  console.log(restaurant);
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
 

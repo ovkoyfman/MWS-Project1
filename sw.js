@@ -1,14 +1,22 @@
 var cacheName = "restaurantsReview01";
 var cacheFiles = [
-    '/',
-    '/index.html',
-    '/restaurant.html',
-    '/css/styles.css',
-    '/idb.js',
-    'js/offlinedb.js',
-    '/js/main.js',
-    '/js/dbhelper.js',
-    '/js/restaurant_info.js'
+    "/",
+    "/restaurant.html",
+    "/css/styles.css",
+    "/idb.js",
+    "/js/main.js",
+    "/js/dbhelper.js",
+    "/js/restaurant_info.js",
+    "/img/1x1.jpg", 
+    "/img/2x1.jpg", 
+    "/img/3x1.jpg", 
+    "/img/4x1.jpg", 
+    "/img/5x1.jpg", 
+    "/img/6x1.jpg", 
+    "/img/7x1.jpg", 
+    "/img/8x1.jpg",
+    "/img/9x1.jpg",
+    "/img/10x1.jpg",
 ];
 if (typeof idb === "undefined") {
   self.importScripts('/idb.js');
@@ -29,8 +37,6 @@ self.addEventListener('install', function(event){
 
 self.addEventListener('fetch', function(event) {
     var requestUrl = new URL(event.request.url);
-    console.log('sw',requestUrl);
-    console.log(event)
       event.respondWith(
         caches.match(event.request)
         .then(function(response) {
