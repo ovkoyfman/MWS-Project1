@@ -70,7 +70,9 @@ fetchRestaurantFromURL = (callback) => {
 fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
-
+  const favorite = document.getElementById('favorite');
+  const favoriteState = restaurant.is_favorite ? "Favorite":"Like it!";
+  favorite.innerHTML = favoriteState;
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
 
@@ -111,7 +113,7 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+fillReviewsHTML = (reviews) => {
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h2');
   title.innerHTML = 'Reviews';

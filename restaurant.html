@@ -41,7 +41,7 @@
 
     <section id="restaurant-container">
       <p id="restaurant-cuisine"></p>
-      <h2 id="restaurant-name"></h2>
+      <div><h2 id="restaurant-name"></h2><span id="favorite"></span></div>
       <img id="restaurant-img">
       <p id="restaurant-address" tabindex="0" aria-label="restaurant address"></p>
       <table id="restaurant-hours" tabindex="0" aria-label="restaurant hours"></table>
@@ -50,8 +50,23 @@
     <!-- Beginning reviews -->
     <section id="reviews-container">
       <ul id="reviews-list"></ul>
-    </section>
     <!-- End reviews -->
+    <form method="POST" id="reviews-form"
+          onsubmit="DBHelper.postReview();">
+             <label for="review" class="review-label">Submit your review</label>
+             <input name="name" id="review_name" class="name_content" placeholder="Your name">
+              <textarea name="review" class="review-content" rows="10" placeholder="Submit review"></textarea>
+              <select name="review-rating" id="review-rating">
+              <option value="" disabled selected>Choose rating &#x25BE;</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+            <button type="submit" class="review-button">Submit</button>
+          </form>
+        </section>
   </main>
   <!-- End main -->
 

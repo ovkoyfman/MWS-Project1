@@ -37,12 +37,15 @@ self.addEventListener('install', function(event){
 
 self.addEventListener('fetch', function(event) {
     var requestUrl = new URL(event.request.url);
+    console.log(event.request.url);
+    if(event.request.url.includes('restaurants')) return;
       event.respondWith(
         caches.match(event.request)
         .then(function(response) {
           if (response) {
             return response;
           }
+
           var fetchRequest = event.request.clone();
           return fetch(fetchRequest).then(
             function(response) {
@@ -56,7 +59,7 @@ self.addEventListener('fetch', function(event) {
                 });
               return response;
             }
-          );
+          ).catch(function(error){console.log(error)});
         })
       );
   });

@@ -155,9 +155,29 @@ createRestaurantHTML = (restaurant) => {
   const more = document.createElement('button');
   more.innerHTML = 'View Details';
   more.onclick = function(){window.open(DBHelper.urlForRestaurant(restaurant), "_self")};
-  li.append(more)
-
-  return li
+  li.append(more);
+  
+  const favorite = document.createElement('span');
+  favorite.innerHTML = restaurant.is_favorite == "true" ? "Favorite":"Like it!";
+  this.className = restaurant.is_favorite == "true" ? "favorite" : "";
+  favorite.onclick = function(){
+    fetch('http://localhost:1337/restaurants/' + restaurant.id + '/?is_favorite=' + !(restaurant.is_favorite == "true"), { method: 'PUT'}).catch(function(error){
+      console.log(error);
+    });
+    var dbPromise = idb.open('restaurantsDatabase');
+    restaurant.is_favorite = !(restaurant.is_favorite == "true");
+    dbPromise.then(function(db){
+      if(!db) return;
+      console.log(restaurant);
+      db.transaction('restaurants','readwrite').objectStore('restaurants').put(restaurant);
+    }) 
+    location.reload(); 
+  }
+  li.append(favorite);
+  return li;
+}
+var updateDatabase = function(restaurant){
+  //fetch('http://localhost:1337/restaurants/' + restaurant.id + '/?is_favorite=' + !restaurant.is_favorite, { method: 'PUT'}); location.reload(); 
 }
 /**
  * Add markers for current restaurants to the map.

@@ -16,29 +16,37 @@ class DBHelper {
     var url;
     url = DBHelper.DATABASE_URL;
     var dbPromise = idb.open('restaurantsDatabase');
-    
-    dbPromise.then(function(db){
-      var dbTransection = db.transaction('restaurants','readonly').objectStore('restaurants').getAll();
-      if(id) return dbTransection.then(function(data){callback(data[id-1])});
-      else  return dbTransection.then(function(data){if(data.length){callback(data)}});
-    })
     fetch(url).then(function(response) {
+      console.log(response.status);
+      if(response.status != 200){
+        
+      } 
       var responseForDatabase = response.clone();
       var responseForPopulating = response.json();
       var restaurants = responseForDatabase.json();
       dbPromise.then(function(db){
         if(!db) return;
         var store = db.transaction('restaurants','readwrite').objectStore('restaurants');
+        console.log(restaurants);
         restaurants.then(function(data){
           data.forEach(function(restaurant){
+            console.log(restaurant);
             store.put(restaurant);
           })
         }) 
       })
       if(id) responseForPopulating.then(function(data){callback(data[id-1])})
       else  responseForPopulating.then(function(data){callback(data)})
-      
-    })
+    }).catch(function(error){
+      console.log(dbPromise);
+      dbPromise.then(function(db){
+        var dbTransection = db.transaction('restaurants','readonly').objectStore('restaurants').getAll();
+        if(id) return dbTransection.then(function(data){callback(data[id-1])});
+        else  return dbTransection.then(function(data){if(data.length){callback(data)}});
+      })
+    });
+    
+    
     //if(id) url = DBHelper.DATABASE_URL + '/?id=' + id;
     //else 
     
