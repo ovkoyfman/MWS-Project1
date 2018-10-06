@@ -158,14 +158,14 @@ createRestaurantHTML = (restaurant) => {
   li.append(more);
   
   const favorite = document.createElement('span');
-  favorite.innerHTML = restaurant.is_favorite == "true" ? "Favorite":"Like it!";
-  this.className = restaurant.is_favorite == "true" ? "favorite" : "";
+  favorite.innerHTML = (restaurant.is_favorite == "true" || restaurant.is_favorite == true) ? "Favorite":"Like it!";
+  this.className = (restaurant.is_favorite == "true" || restaurant.is_favorite == true) ? "favorite" : "";
   favorite.onclick = function(){
-    fetch('http://localhost:1337/restaurants/' + restaurant.id + '/?is_favorite=' + !(restaurant.is_favorite == "true"), { method: 'PUT'}).catch(function(error){
+    fetch('http://localhost:1337/restaurants/' + restaurant.id + '/?is_favorite=' + !(restaurant.is_favorite == "true" || restaurant.is_favorite == true), { method: 'PUT'}).catch(function(error){
       console.log(error);
     });
     var dbPromise = idb.open('restaurantsDatabase');
-    restaurant.is_favorite = !(restaurant.is_favorite == "true");
+    restaurant.is_favorite = !(restaurant.is_favorite == "true" || restaurant.is_favorite == true);
     dbPromise.then(function(db){
       if(!db) return;
       console.log(restaurant);
