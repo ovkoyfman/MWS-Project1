@@ -82,12 +82,15 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
+  const id = document.getElementById('restaurant-id');
+  id.value = restaurant.id;
   // fill operating hours
   if (restaurant.operating_hours) {
     fillRestaurantHoursHTML();
   }
   // fill reviews
-  fillReviewsHTML();
+  console.log(restaurant);
+  fillReviewsHTML(restaurant.reviews);
 }
 
 /**
@@ -142,7 +145,8 @@ createReviewHTML = (review) => {
   li.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = review.date;
+  var myDate = new Date(review.createdAt)
+  date.innerHTML = (myDate.getMonth()+1) + "/" + myDate.getDate() + "/" + myDate.getFullYear();
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -155,7 +159,31 @@ createReviewHTML = (review) => {
 
   return li;
 }
-
+function postReview() { 
+	const id = getParameterByName('id'); 
+	const username = document.getElementById("review-name").value; 
+	const rating = document.getElementById("review-rating").value; 
+	const content = document.getElementById("review-content").value;
+	const review = { 
+		"restaurant_id": id, 
+		"name": username, 
+		"rating": rating, 
+		"comments": content
+	}
+  console.log(review);
+	fetch(
+		'http://localhost:1337/reviews/', { 
+			method: 'POST', 
+			body: JSON.stringify(review), 
+			headers: { 'content-type': 'application/json' 
+		} 
+  }).then(response => response.json()).then(response => { 
+    console.log(response); 
+  }).catch(error => { 
+    console.log(error); 
+  }); 
+  location.reload();
+ }
 /**
  * Add restaurant name to the breadcrumb navigation menu
  */

@@ -13,32 +13,44 @@ class DBHelper {
   }
   
   static fetchRestaurants(id,callback){
+    
+    const dbPromise = idb.open('restaurantsDatabase', 2, function(upgradeDb) {
+     // switch (upgradeDb.oldVersion) {
+       // case 0:
+          upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
+        //case 1:
+          //upgradeDb.createObjectStore('reviews', {keyPath: 'id'});
+      //}
+    });
     var url;
     url = DBHelper.DATABASE_URL;
-    var dbPromise = idb.open('restaurantsDatabase');
-    fetch(url).then(function(response) {
-      console.log(response.status);
-      if(response.status != 200){
-        
-      } 
-      var responseForDatabase = response.clone();
-      var responseForPopulating = response.json();
-      var restaurants = responseForDatabase.json();
+    fetch(url).then(function(response) { 
+      console.log("fetching..."); 
+      var restaurants = response.json();
       dbPromise.then(function(db){
         if(!db) return;
-        var store = db.transaction('restaurants','readwrite').objectStore('restaurants');
+        //var store = db.transaction('restaurants','readwrite').objectStore('restaurants');
         console.log(restaurants);
         restaurants.then(function(data){
           data.forEach(function(restaurant){
-            console.log(restaurant);
-            store.put(restaurant);
-          })
-        }) 
-      })
-      if(id) responseForPopulating.then(function(data){callback(data[id-1])})
-      else  responseForPopulating.then(function(data){callback(data)})
+            console.log(restaurant.id);
+            fetch('http://localhost:1337/reviews/?restaurant_id=' + restaurant.id).then(function(data){ return data.json();}).then(function(data){
+              var reviews = data;
+              console.log("Data for reviews",reviews);
+              restaurant.reviews = reviews;
+            }).then(function(){
+              db.transaction('restaurants','readwrite').objectStore('restaurants').put(restaurant);
+              if (data.length == restaurant.id){
+                var tx = db.transaction('restaurants','readonly').objectStore('restaurants').getAll();
+                if(id) return tx.then(function(data){callback(data[id-1])});
+                else  return tx.then(function(data){if(data.length){callback(data)}}); 
+              }
+            })
+          });
+        })
+      }).catch(function(error){console.log(error)});
     }).catch(function(error){
-      console.log(dbPromise);
+      console.log(error);
       dbPromise.then(function(db){
         var dbTransection = db.transaction('restaurants','readonly').objectStore('restaurants').getAll();
         if(id) return dbTransection.then(function(data){callback(data[id-1])});

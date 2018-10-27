@@ -51,22 +51,23 @@
     <section id="reviews-container">
       <ul id="reviews-list"></ul>
     <!-- End reviews -->
-    <form method="POST" id="reviews-form"
-          onsubmit="DBHelper.postReview();">
-             <label for="review" class="review-label">Submit your review</label>
-             <input name="name" id="review_name" class="name_content" placeholder="Your name">
-              <textarea name="review" class="review-content" rows="10" placeholder="Submit review"></textarea>
-              <select name="review-rating" id="review-rating">
-              <option value="" disabled selected>Choose rating &#x25BE;</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-            </select>
-            <button type="submit" class="review-button">Submit</button>
-          </form>
-        </section>
+    <div id="reviews-form">
+          <label for="review" class="review-label">Submit your review</label>
+          <input name="name" id="review-name" class="name-content" placeholder="Your name">
+          <textarea name="review" id="review-content" class="review-content" rows="10" placeholder="Submit review"></textarea>
+          <select name="review-rating" id="review-rating">
+          <option value="" disabled selected>Choose rating</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+        <input type="hidden" id="restaurant-id">
+        <button type="submit" class="review-button" onclick="postReview();">Submit</button>
+      </div>
+    </section>
+    
   </main>
   <!-- End main -->
 

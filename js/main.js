@@ -12,10 +12,6 @@ var neighborhoodDataFilled = false;
  */
 
 document.addEventListener('DOMContentLoaded', (event) => {
-  dbPromise = idb.open('restaurantsDatabase', 1, function(upgradeDb) {
-    upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
-  });
-  
   DBHelper.fetchRestaurants(null, function(data){
     self.restaurantsFetchedData = data;
     updateRestaurants();
