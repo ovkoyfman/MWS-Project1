@@ -1,6 +1,7 @@
 var cacheName = "restaurantsReview01";
 var cacheFiles = [
     "/",
+    "/manifest.json",
     "/restaurant.html",
     "/css/styles.css",
     "/idb.js",
@@ -37,7 +38,6 @@ self.addEventListener('install', function(event){
 
 self.addEventListener('fetch', function(event) {
     var requestUrl = new URL(event.request.url);
-    console.log(event.request.url);
     if(event.request.url.includes('restaurants') || event.request.url.includes('reviews')) return;
       event.respondWith(
         caches.match(event.request)

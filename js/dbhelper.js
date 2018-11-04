@@ -1,6 +1,7 @@
 /**
  * Common database helper functions.
  */
+let nextReviewId = 0;
 class DBHelper {
 
   /**
@@ -11,35 +12,68 @@ class DBHelper {
     const port = 1337 // Change this to your server port
     return `http://localhost:${port}/restaurants`;
   }
-  
+  static dbPromise() {
+    return idb.open('restaurantsDatabase', 3, function(upgradeDb) {
+    switch (upgradeDb.oldVersion) {
+      case 0:
+        upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
+      case 1:
+        upgradeDb.createObjectStore('reviews', {keyPath: 'id'});
+      case 2:
+        upgradeDb.createObjectStore('unpostedReviews', {keyPath: 'id'});
+     }
+   });
+  }
   static fetchRestaurants(id,callback){
-    
-    const dbPromise = idb.open('restaurantsDatabase', 2, function(upgradeDb) {
-     // switch (upgradeDb.oldVersion) {
-       // case 0:
-          upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
-        //case 1:
-          //upgradeDb.createObjectStore('reviews', {keyPath: 'id'});
-      //}
+    //create or open database
+    DBHelper.dbPromise().then(function(db){
+      if(!db) return;
+      //get all unposted reviews
+      let tx = db.transaction('unpostedReviews').objectStore('unpostedReviews').getAll();
+      //if anything is there, post it online and deledte, if connection is unsuccessful, error  will be thrown and unposted revies will stay in database
+      tx.then(data => {
+        if (data.length) data.forEach(function(unpostedReview){
+          fetch(
+            'http://localhost:1337/reviews/', {
+              method: 'POST', 
+              body: JSON.stringify(unpostedReview), 
+              headers: { 'content-type': 'application/json' 
+            } 
+          }).then(response => {
+            response.json();
+            db.transaction('unpostedReviews','readwrite').objectStore('unpostedReviews').delete(unpostedReview.id); 
+          }).then(response => { 
+          }).catch(error => {console.log(error)});
+        })
+      })
     });
     var url;
+   
+     if(!id){ 
     url = DBHelper.DATABASE_URL;
+    //fetch restaurants
     fetch(url).then(function(response) { 
-      console.log("fetching..."); 
       var restaurants = response.json();
-      dbPromise.then(function(db){
+      //open database
+       DBHelper.dbPromise().then(function(db){
         if(!db) return;
         //var store = db.transaction('restaurants','readwrite').objectStore('restaurants');
-        console.log(restaurants);
+        
         restaurants.then(function(data){
           data.forEach(function(restaurant){
-            console.log(restaurant.id);
+            //get reviews
             fetch('http://localhost:1337/reviews/?restaurant_id=' + restaurant.id).then(function(data){ return data.json();}).then(function(data){
               var reviews = data;
-              console.log("Data for reviews",reviews);
-              restaurant.reviews = reviews;
+              nextReviewId+= reviews.length;
+              //restaurant.reviews = reviews;
+              //post reviews to the reviews table
+              reviews.forEach(function(review){
+                db.transaction('reviews','readwrite').objectStore('reviews').put(review);
+              })
+              localStorage.setItem('id', nextReviewId);
             }).then(function(){
               db.transaction('restaurants','readwrite').objectStore('restaurants').put(restaurant);
+              //if it's last restaurant
               if (data.length == restaurant.id){
                 var tx = db.transaction('restaurants','readonly').objectStore('restaurants').getAll();
                 if(id) return tx.then(function(data){callback(data[id-1])});
@@ -48,23 +82,55 @@ class DBHelper {
             })
           });
         })
-      }).catch(function(error){console.log(error)});
+      }).catch(function(error){
+        console.log(error)
+      })
     }).catch(function(error){
       console.log(error);
-      dbPromise.then(function(db){
+      DBHelper.dbPromise().then(function(db){
         var dbTransection = db.transaction('restaurants','readonly').objectStore('restaurants').getAll();
         if(id) return dbTransection.then(function(data){callback(data[id-1])});
         else  return dbTransection.then(function(data){if(data.length){callback(data)}});
       })
-    });
-    
-    
-    //if(id) url = DBHelper.DATABASE_URL + '/?id=' + id;
-    //else 
-    
-    // fetch(url).then(function(response) {
-    //     return tempResponse;
-    //   }).then(callback).catch(callbackError);
+    });;
+    }
+    else{
+      url = DBHelper.DATABASE_URL + "/" + id;
+    //fetch restaurants
+    fetch(url).then(function(response) { 
+      var restaurant = response.json();
+      //open database
+      DBHelper.dbPromise().then(function(db){
+        if(!db) return;
+        //var store = db.transaction('restaurants','readwrite').objectStore('restaurants');
+        
+        restaurant.then(function(data){
+            //get reviews
+            fetch('http://localhost:1337/reviews/?restaurant_id=' + id).then(function(data){ return data.json();}).then(function(data){
+              var reviews = data;
+              nextReviewId = parseInt(localStorage.getItem('id'));
+              //restaurant.reviews = reviews;
+              //post reviews to the reviews table
+              reviews.forEach(function(review){
+                db.transaction('reviews','readwrite').objectStore('reviews').put(review);
+              })
+              localStorage.setItem('id', nextReviewId);
+            }).then(function(){
+              db.transaction('restaurants','readwrite').objectStore('restaurants').put(data);
+               callback(data);
+              })
+        })
+      }).catch(function(error){
+        console.log(error)
+      })
+    }).catch(function(error){
+        DBHelper.dbPromise().then(function(db){
+          var dbTransection = db.transaction('restaurants','readonly').objectStore('restaurants').getAll();
+          if(id) return dbTransection.then(function(data){callback(data[id-1])});
+          else  return dbTransection.then(function(data){if(data.length){callback(data)}});
+        })
+      });;
+    }
    }
   /**
    * Fetch a restaurant by its ID.

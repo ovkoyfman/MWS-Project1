@@ -154,26 +154,27 @@ createRestaurantHTML = (restaurant) => {
   li.append(more);
   
   const favorite = document.createElement('span');
-  favorite.innerHTML = (restaurant.is_favorite == "true" || restaurant.is_favorite == true) ? "Favorite":"Like it!";
-  this.className = (restaurant.is_favorite == "true" || restaurant.is_favorite == true) ? "favorite" : "";
+  //in case if restaurant.is_favorite is undefined
+  if(!restaurant.is_favorite) restaurant.is_favorite = false;
+  favorite.innerHTML = JSON.parse(restaurant.is_favorite) ? "Favorite":"Like it!";
+  this.className = JSON.parse(restaurant.is_favorite) ? "favorite" : "";
   favorite.onclick = function(){
-    fetch('http://localhost:1337/restaurants/' + restaurant.id + '/?is_favorite=' + !(restaurant.is_favorite == "true" || restaurant.is_favorite == true), { method: 'PUT'}).catch(function(error){
-      console.log(error);
+    restaurant.is_favorite = !JSON.parse(restaurant.is_favorite); 
+    fetch('http://localhost:1337/restaurants/' + restaurant.id + '/?is_favorite=' + JSON.parse(restaurant.is_favorite), { method: 'PUT'}).catch(function(error){
     });
-    var dbPromise = idb.open('restaurantsDatabase');
-    restaurant.is_favorite = !(restaurant.is_favorite == "true" || restaurant.is_favorite == true);
-    dbPromise.then(function(db){
-      if(!db) return;
-      console.log(restaurant);
-      db.transaction('restaurants','readwrite').objectStore('restaurants').put(restaurant);
-    }) 
-    location.reload(); 
+    favorite.innerHTML = JSON.parse(restaurant.is_favorite) ? "Favorite":"Like it!";
+    //var dbPromise = idb.open('restaurantsDatabase');
+    updateDatabase(restaurant);
   }
   li.append(favorite);
   return li;
 }
 var updateDatabase = function(restaurant){
-  //fetch('http://localhost:1337/restaurants/' + restaurant.id + '/?is_favorite=' + !restaurant.is_favorite, { method: 'PUT'}); location.reload(); 
+  DBHelper.dbPromise().then(function(db){
+    if(!db) return;
+    let tx = db.transaction('restaurants','readwrite');
+    tx.objectStore('restaurants').put(restaurant);
+  }).catch(error => console.log(error));
 }
 /**
  * Add markers for current restaurants to the map.

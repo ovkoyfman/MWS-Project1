@@ -1,6 +1,5 @@
 let restaurant;
 var newMap;
-
 /**
  * Initialize map as soon as the page is loaded.
  */
@@ -30,35 +29,19 @@ initMap = () => {
     DBHelper.mapMarkerForRestaurant(self.restaurant, self.newMap);
   });
 }  
- 
-/* window.initMap = () => {
-  fetchRestaurantFromURL((error, restaurant) => {
-    if (error) { // Got an error!
-      console.error(error);
-    } else {
-      self.map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 16,
-        center: restaurant.latlng,
-        scrollwheel: false
-      });
-      fillBreadcrumb();
-      DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
-    }
-  });
-} */
 
 /**
  * Get current restaurant from page URL.
  */
 fetchRestaurantFromURL = (callback) => {
-  DBHelper.fetchRestaurants(null, function(data){
+  const id = getParameterByName('id');
+  DBHelper.fetchRestaurants(id, function(data){
     self.restaurantsFetchedData = data;
     if (self.restaurant) { // restaurant already fetched!
       callback(self.restaurant)
       return;
     }
-    const id = getParameterByName('id');
-    restaurant = restaurantsFetchedData[id-1];
+    restaurant = restaurantsFetchedData;
     self.restaurant = restaurant;
     fillRestaurantHTML();
     callback(restaurant)
@@ -71,14 +54,31 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
   const favorite = document.getElementById('favorite');
-  const favoriteState = restaurant.is_favorite ? "Favorite":"Like it!";
-  favorite.innerHTML = favoriteState;
+  if(!restaurant.is_favorite) restaurant.is_favorite = false;
+  favorite.innerHTML = JSON.parse(restaurant.is_favorite) ? "Favorite":"Like it!";
+  this.className = JSON.parse(restaurant.is_favorite) ? "favorite" : "";
+  favorite.onclick = function(){
+    restaurant.is_favorite = !JSON.parse(restaurant.is_favorite); 
+    fetch('http://localhost:1337/restaurants/' + restaurant.id + '/?is_favorite=' + JSON.parse(restaurant.is_favorite), { method: 'PUT'}).catch(function(error){
+    });
+    favorite.innerHTML = JSON.parse(restaurant.is_favorite) ? "Favorite":"Like it!";
+    //var dbPromise = idb.open('restaurantsDatabase');
+    updateDatabase(restaurant);
+  }
+  var updateDatabase = function(restaurant){
+    DBHelper.dbPromise().then(function(db){
+      if(!db) return;
+      let tx = db.transaction('restaurants','readwrite');
+      tx.objectStore('restaurants').put(restaurant);
+    }).catch(error => console.log(error));
+  }
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
 
   const image = document.getElementById('restaurant-img');
   image.className = 'restaurant-img'
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.alt ="Image of " + restaurant.name + " Restaurant";
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
@@ -89,8 +89,16 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
     fillRestaurantHoursHTML();
   }
   // fill reviews
-  console.log(restaurant);
-  fillReviewsHTML(restaurant.reviews);
+  let reviewsArray = [];
+  DBHelper.dbPromise().then(function(db){
+    let reviews = db.transaction('reviews').objectStore('reviews').getAll();
+    reviews.then(data => {
+      data.forEach(function(review){
+        if(review.restaurant_id == restaurant.id) reviewsArray.push(review);
+      });
+      fillReviewsHTML(reviewsArray);
+    }).catch(error=>{console.log(error)});
+  }).catch(error=>{console.log(error)});
 }
 
 /**
@@ -145,6 +153,7 @@ createReviewHTML = (review) => {
   li.appendChild(name);
 
   const date = document.createElement('p');
+  if(!review.createdAt) review.createdAt = new Date();
   var myDate = new Date(review.createdAt)
   date.innerHTML = (myDate.getMonth()+1) + "/" + myDate.getDate() + "/" + myDate.getFullYear();
   li.appendChild(date);
@@ -163,24 +172,32 @@ function postReview() {
 	const id = getParameterByName('id'); 
 	const username = document.getElementById("review-name").value; 
 	const rating = document.getElementById("review-rating").value; 
-	const content = document.getElementById("review-content").value;
+  const content = document.getElementById("review-content").value;
+  let nextReviewId = parseInt(localStorage.getItem('id')) + 1;
+  localStorage.setItem('id', nextReviewId);
 	const review = { 
+    "id": nextReviewId,
 		"restaurant_id": id, 
 		"name": username, 
 		"rating": rating, 
-		"comments": content
+    "comments": content
 	}
-  console.log(review);
 	fetch(
-		'http://localhost:1337/reviews/', { 
+		'http://localhost:1337/reviews/', {
 			method: 'POST', 
 			body: JSON.stringify(review), 
 			headers: { 'content-type': 'application/json' 
 		} 
   }).then(response => response.json()).then(response => { 
-    console.log(response); 
-  }).catch(error => { 
-    console.log(error); 
+    if(!db){return;} 
+    db.transaction('reviews','readwrite').objectStore('reviews').put(review);
+  }).catch(error => {
+    DBHelper.dbPromise().then(function(db){
+      console.log(error);
+      if(!db){return;} 
+      db.transaction('unpostedReviews','readwrite').objectStore('unpostedReviews').put(review);
+      db.transaction('reviews','readwrite').objectStore('reviews').put(review);
+    });
   }); 
   location.reload();
  }
