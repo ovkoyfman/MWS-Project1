@@ -55,13 +55,14 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   name.innerHTML = restaurant.name;
   const favorite = document.getElementById('favorite');
   if(!restaurant.is_favorite) restaurant.is_favorite = false;
-  favorite.innerHTML = JSON.parse(restaurant.is_favorite) ? "Favorite":"Like it!";
-  this.className = JSON.parse(restaurant.is_favorite) ? "favorite" : "";
+  favorite.className = JSON.parse(restaurant.is_favorite) ? "red":"white";
+  favorite.innerHTML = '<div class="heart"></div><div class="heart-overlap"></div></div>';
+  
   favorite.onclick = function(){
     restaurant.is_favorite = !JSON.parse(restaurant.is_favorite); 
     fetch('http://localhost:1337/restaurants/' + restaurant.id + '/?is_favorite=' + JSON.parse(restaurant.is_favorite), { method: 'PUT'}).catch(function(error){
     });
-    favorite.innerHTML = JSON.parse(restaurant.is_favorite) ? "Favorite":"Like it!";
+    this.className = JSON.parse(restaurant.is_favorite) ? "red":"white";
     //var dbPromise = idb.open('restaurantsDatabase');
     updateDatabase(restaurant);
   }

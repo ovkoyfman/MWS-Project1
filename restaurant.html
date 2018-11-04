@@ -17,13 +17,10 @@
   <!-- Beginning header -->
   <header>
     <!-- Beginning nav -->
-    <nav>
+    <nav aria-label="breadcrumb"></nav>
       <h1><a href="/">Restaurant Reviews</a></h1>
-    </nav>
-    <!-- Beginning breadcrumb -->
-    <nav aria-label="breadcrumb">
       <ul id="breadcrumb" >
-        <li><a href="/">Home</a></li>
+        <li><a href="/"  aria-current="page">Home</a></li>
       </ul>
     </nav>
     <!-- End breadcrumb -->
@@ -42,7 +39,7 @@
 
     <section id="restaurant-container">
       <p id="restaurant-cuisine"></p>
-      <div><h2 id="restaurant-name"></h2><span id="favorite"></span></div>
+      <div><h2 id="restaurant-name"></h2><div id="favorite"></div></div>
       <img id="restaurant-img">
       <p id="restaurant-address" tabindex="0" aria-label="restaurant address"></p>
       <table id="restaurant-hours" tabindex="0" aria-label="restaurant hours"></table>

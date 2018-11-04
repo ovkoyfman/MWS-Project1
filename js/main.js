@@ -5,8 +5,18 @@ let restaurants,
 var newMap
 var markers = [];
 var neighborhoodDataFilled = false;
-
-
+const altTags = [
+  "Mission Chinese Food Restaurant Atmosphere",
+  "A pepperoni pizza served at Emily Restaurant",
+  "Serving station at Kang Ho Baekjeong",
+  "Corner of Katz's Delicatessen",
+  "Relaxed environment in Roberta's Pizza",
+  "Homey atmosphere in Hometown BBQ",
+  "Two young men standing outside the entrance to Superiority Burger",
+  "Entrance to The Dutch Restaurant",
+  "Young people having dinner in Mu Ramen Restaurant",
+  "Airy space in Casa Enrique"
+];
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
@@ -20,39 +30,32 @@ document.addEventListener('DOMContentLoaded', (event) => {
 });
 var fillData = (restaurants) => {
   self.restaurants = restaurants;
-
-  const allCuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
+  const uniq = xs => [...new Set(xs)];
   // Remove duplicates from cuisines
-  const cuisines = allCuisines.filter((v, i) => allCuisines.indexOf(v) == i)
-  const allNeighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood)
+  const getCuisineType = ({cuisine_type} = {}) => cuisine_type;
+  const allCuisines = restaurants.map(getCuisineType);
+  const cuisines = uniq(allCuisines);
+  console.log(cuisines);
+  const getNeigborhood = ({neighborhood} = {}) => neighborhood
+  const allNeighborhoods = restaurants.map(getNeigborhood)
   // Remove duplicates from neighborhoods
-  const neighborhoods = allNeighborhoods.filter((v, i) => allNeighborhoods.indexOf(v) == i)
+  const neighborhoods = uniq(allNeighborhoods);
   if(!neighborhoodDataFilled){
-    fillNeighborhoodsHTML(neighborhoods);
-    fillCuisinesHTML(cuisines);
+    fillOptionsHTML(neighborhoods, 'neighborhoods-select');
+    fillOptionsHTML(cuisines, 'cuisines-select');
     neighborhoodDataFilled = true;
   }
 }
 /**
  * Set neighborhoods HTML.
  */
-var fillNeighborhoodsHTML = (neighborhoods) => {
-  const select = document.getElementById('neighborhoods-select');
-  neighborhoods.forEach(neighborhood => {
-    const option = document.createElement('option');
-    option.innerHTML = neighborhood;
-    option.value = neighborhood;
-    select.append(option);
-  });
-}
-
-fillCuisinesHTML = (cuisines = self.cuisines) => {
-  const select = document.getElementById('cuisines-select');
-  cuisines.forEach(cuisine => {
-    const option = document.createElement('option');
-    option.innerHTML = cuisine;
-    option.value = cuisine;
-    select.append(option);
+const fillOptionsHTML = (array, id) => {
+  const select = document.getElementById(id);
+  array.forEach(value => {
+  const option = document.createElement('option');
+  option.innerHTML = value;
+  option.value = value;
+  select.append(option);
   });
 }
 
@@ -132,7 +135,7 @@ createRestaurantHTML = (restaurant) => {
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
   image.srcset = DBHelper.imageUrlForRestaurantx1(restaurant) + ' 400w, ' + DBHelper.imageUrlForRestaurant(restaurant) + ' 800w';
   image.sizes = "(max-width: 575px) 85vw, (max-width: 991px) 43vw, (min-width: 992px) 30vw";
-  image.alt ="Image of " + restaurant.name + " Restaurant";
+  image.alt =altTags[(restaurant.id - 1)];
   li.append(image);
 
   const name = document.createElement('h2');
@@ -153,16 +156,17 @@ createRestaurantHTML = (restaurant) => {
   more.onclick = function(){window.open(DBHelper.urlForRestaurant(restaurant), "_self")};
   li.append(more);
   
-  const favorite = document.createElement('span');
-  //in case if restaurant.is_favorite is undefined
+  const favorite = document.createElement('div');
   if(!restaurant.is_favorite) restaurant.is_favorite = false;
-  favorite.innerHTML = JSON.parse(restaurant.is_favorite) ? "Favorite":"Like it!";
-  this.className = JSON.parse(restaurant.is_favorite) ? "favorite" : "";
+  favorite.className = JSON.parse(restaurant.is_favorite) ? "red":"white";
+  favorite.innerHTML = '<div class="heart"></div><div class="heart-overlap"></div></div>';
+  
+  
   favorite.onclick = function(){
     restaurant.is_favorite = !JSON.parse(restaurant.is_favorite); 
     fetch('http://localhost:1337/restaurants/' + restaurant.id + '/?is_favorite=' + JSON.parse(restaurant.is_favorite), { method: 'PUT'}).catch(function(error){
     });
-    favorite.innerHTML = JSON.parse(restaurant.is_favorite) ? "Favorite":"Like it!";
+    this.className = JSON.parse(restaurant.is_favorite) ? "red":"white";
     //var dbPromise = idb.open('restaurantsDatabase');
     updateDatabase(restaurant);
   }

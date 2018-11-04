@@ -25,40 +25,18 @@ class DBHelper {
    });
   }
   static fetchRestaurants(id,callback){
-    //create or open database
-    DBHelper.dbPromise().then(function(db){
-      if(!db) return;
-      //get all unposted reviews
-      let tx = db.transaction('unpostedReviews').objectStore('unpostedReviews').getAll();
-      //if anything is there, post it online and deledte, if connection is unsuccessful, error  will be thrown and unposted revies will stay in database
-      tx.then(data => {
-        if (data.length) data.forEach(function(unpostedReview){
-          fetch(
-            'http://localhost:1337/reviews/', {
-              method: 'POST', 
-              body: JSON.stringify(unpostedReview), 
-              headers: { 'content-type': 'application/json' 
-            } 
-          }).then(response => {
-            response.json();
-            db.transaction('unpostedReviews','readwrite').objectStore('unpostedReviews').delete(unpostedReview.id); 
-          }).then(response => { 
-          }).catch(error => {console.log(error)});
-        })
-      })
-    });
+    DBHelper.postPendingReviewIfOnline();
     var url;
-   
-     if(!id){ 
+    if(!id){ 
     url = DBHelper.DATABASE_URL;
     //fetch restaurants
     fetch(url).then(function(response) { 
       var restaurants = response.json();
       //open database
-       DBHelper.dbPromise().then(function(db){
+       DBHelper.dbPromise().then(
+        function(db){
         if(!db) return;
         //var store = db.transaction('restaurants','readwrite').objectStore('restaurants');
-        
         restaurants.then(function(data){
           data.forEach(function(restaurant){
             //get reviews
@@ -132,6 +110,29 @@ class DBHelper {
       });;
     }
    }
+  static postPendingReviewIfOnline() {
+    DBHelper.dbPromise().then(function(db){
+      if(!db) return;
+      //get all unposted reviews
+      let tx = db.transaction('unpostedReviews').objectStore('unpostedReviews').getAll();
+      //if anything is there, post it online and deledte, if connection is unsuccessful, error  will be thrown and unposted revies will stay in database
+      tx.then(data => {
+        if (data.length) data.forEach(function(unpostedReview){
+          fetch(
+            'http://localhost:1337/reviews/', {
+              method: 'POST', 
+              body: JSON.stringify(unpostedReview), 
+              headers: { 'content-type': 'application/json' 
+            } 
+          }).then(response => {
+            response.json();
+            db.transaction('unpostedReviews','readwrite').objectStore('unpostedReviews').delete(unpostedReview.id); 
+          }).then(response => { 
+          }).catch(error => {console.log(error)});
+        })
+      })
+    });
+  }
   /**
    * Fetch a restaurant by its ID.
    */

@@ -18,11 +18,11 @@ ul, li {
   color: #333;
 }
 a {
-  color: orange;
+  color: #ffffff;
   text-decoration: none;
 }
 a:hover, a:focus {
-  color: #3397db;
+  color: #0275d8;
   text-decoration: none;
 }
 a img{
@@ -41,7 +41,7 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
 }
 #footer {
   background-color: #444;
-  color: #aaa;
+  color: #fff;
   font-size: 8pt;
   letter-spacing: 1px;
   padding: 25px;
@@ -61,7 +61,7 @@ nav h1 {
 }
 nav h1 a {
   color: #fff;
-  font-size: 25pt;
+  font-size: 23pt;
   font-weight: 200;
   letter-spacing: 10px;
   text-transform: uppercase;
@@ -98,6 +98,9 @@ nav h1 a {
     color: #01447e;
     text-decoration: underline;
 }
+.leaflet-container a {
+  color: #01447e;
+}
 /* ====================== Map ====================== */
 #map {
   height: 400px;
@@ -108,7 +111,7 @@ nav h1 a {
 .filter-options {
   width: calc(100% - 30px);
   /*height: 50px;*/
-  background-color: #3397DB;
+  background-color: #0275d8;
   align-items: center;
   display: table;
   padding: 15px;
@@ -167,11 +170,6 @@ nav h1 a {
 #restaurants-list li span{
   bottom: 20px;
 }
-#restaurants-list li span.favorite, #restaurant-container span.favorite {
-  background-color: #fff;
-  color: #f18200;
-  border-color: #f18200;
-}
 #restaurants-list .restaurant-img {
   background-color: #fff;
   display: block;
@@ -184,7 +182,7 @@ nav h1 a {
   padding-top: 10px;
 }
 #restaurants-list li h2 {
-  color: #f18200;
+  color: #BD6500;
   font-family: Arial,sans-serif;
   font-size: 14pt;
   font-weight: 200;
@@ -198,7 +196,7 @@ nav h1 a {
   font-size: 11pt;
 }
 #restaurants-list li button {
-  background-color: #f18200;
+  background-color: #BD6500;
   border: none;
   color: #fff;
   display: inline-block;
@@ -209,23 +207,34 @@ nav h1 a {
   text-decoration: none;
   text-transform: uppercase;
   cursor: pointer;
-  border: 2px solid #f18200;
+  border: 2px solid #BD6500;
   position: absolute;
-  bottom: 20px;
+  bottom: 40px;
+}
+#restaurants-list li > div{
+  top: 20px;
+  position: absolute;
+  right: 0;
+  top: 30px;
+  min-height: 40px;
+  min-width: 40px;
 }
 #restaurants-list li button:hover{
   background-color: #fff;
-  color: #f18200;
+  color: #BD6500;
 }
 /* ====================== Restaurant Details ====================== */
+
 .inside header {
   position: fixed;
   top: 0;
   width: 100%;
   z-index: 9999;
+  background-color: #333;
+  text-align: center;
 }
 .inside #map-container {
-  background: blue none repeat scroll 0 0;
+  background: #333 none repeat scroll 0 0;
   height: 400px;
   right: 0;
   padding-top: 131px;
@@ -243,7 +252,7 @@ nav h1 a {
   width: calc(100% - 50px);
 }
 #restaurant-name {
-  color: #f18200;
+  color: #BD6500;
   font-family: Arial,sans-serif;
   font-size: 20pt;
   font-weight: 200;
@@ -277,17 +286,24 @@ nav h1 a {
   padding: 10px 20px 30px 20px;
   width: calc(100% - 40px);
 }
-#restaurant-container div{
+#restaurant-container > div{
   position: relative;
+} 
+div#favorite {
+  position: absolute;
+    right: 0;
+    top: 30px;
+    min-height: 40px;
+    min-width: 40px;
 }
-#restaurant-container span#favorite {
-  margin-left: 20px;
+#restaurant-container div#favorite {
+    top: 20px;
 }
 #reviews-container {
   padding: 30px 20px 80px;
 }
 #reviews-container h2 {
-  color: #f58500;
+  color: #BD6500;
   font-size: 24pt;
   font-weight: 300;
   letter-spacing: -1px;
@@ -315,6 +331,61 @@ nav h1 a {
 }
 label.hidden{
   display: none;
+}
+.heart, .heart-overlap {
+  position: absolute;
+}
+.heart {
+  height: 15px;
+  transform: rotate(-45deg);
+  width: 15px;
+  right: 26px;
+}
+.heart-overlap{
+  height: 15px;
+  transform: rotate(-45deg);
+  width: 15px;
+  right: 24px;
+  top: 0;
+}
+.red .heart-overlap{
+  top: -1px;
+}
+.white .heart-overlap{
+  background-color: #ffffff;
+  border-left:1px solid #ff0000;
+  border-bottom:1px solid #ff0000;
+}
+.red .heart-overlap{
+  background-color: #ff0000;
+  border:1px solid #ff0000;
+}
+.heart:before,
+.heart:after {
+  content: "";
+  border-radius: 50%;
+  height: 15px;
+  position: absolute;
+  width: 15px;
+}
+.heart:before {
+  top: -7px;
+  left: 0;
+}
+.heart:after {
+  left: 7px;
+  top: 0;
+}
+.heart {
+  border: none;
+}
+.white .heart:before,.white .heart:after {
+  background-color: #ffffff;
+  border:1px solid #ff0000;
+}
+.red .heart:before,.red .heart:after {
+  background-color: #ff0000;
+  border:1px solid #ff0000;
 }
 /*****************Form***********************/
 #reviews-container label,#reviews-container input,#reviews-container textarea,#reviews-container select{
